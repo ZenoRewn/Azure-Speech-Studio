@@ -41,7 +41,7 @@ ASIA_SPEECH_REGION=your_region          # 例如 eastasia
 # Azure OpenAI（用于 Live Interpreter 等功能）
 AZURE_OPENAI_API_KEY=your_aoai_key
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
+AZURE_OPENAI_DEPLOYMENT=gpt-4o
 AZURE_OPENAI_VERSION=2025-04-01-preview
 
 # Azure Voice Live（用于 Voice Live 功能）
