@@ -1,0 +1,8 @@
+flask
+flask-socketio
+azure-cognitiveservices-speech
+python-dotenv
+openai
+requests
+numpy
+azure-ai-voicelive[aiohttp]

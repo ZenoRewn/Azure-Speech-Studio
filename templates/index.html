@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure Speech Studio</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body data-theme="dark">
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-content">
+      <h2>Configuration</h2>
+
+      <section>
+        <h3>Azure Speech</h3>
+        <label>Speech Key
+          <input type="password" id="cfg-speech-key" value="{{ env_defaults.speech_key }}" placeholder="Enter Speech Key">
+        </label>
+        <label>Speech Region
+          <input type="text" id="cfg-speech-region" value="{{ env_defaults.speech_region }}" placeholder="e.g. eastasia">
+        </label>
+      </section>
+
+      <section>
+        <h3>Azure OpenAI</h3>
+        <label>API Key
+          <input type="password" id="cfg-aoai-key" value="{{ env_defaults.aoai_key }}" placeholder="Enter OpenAI Key">
+        </label>
+        <label>Endpoint
+          <input type="text" id="cfg-aoai-endpoint" value="{{ env_defaults.aoai_endpoint }}" placeholder="https://...openai.azure.com/">
+        </label>
+        <label>Deployment Name
+          <input type="text" id="cfg-aoai-deployment" value="{{ env_defaults.aoai_deployment }}">
+        </label>
+        <label>API Version
+          <input type="text" id="cfg-aoai-version" value="{{ env_defaults.aoai_version }}">
+        </label>
+      </section>
+    </div>
+
+    <button id="sidebar-toggle" title="Toggle sidebar">&laquo;</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <div class="header-row">
+      <h1>Azure Speech Studio Web GUI</h1>
+      <button id="theme-toggle"><span id="theme-icon">&#9789;</span> <span id="theme-label">Dark</span></button>
+    </div>
+
+    <nav id="tabs">
+      <button class="tab-btn active" data-tab="stt">Speech STT</button>
+      <button class="tab-btn" data-tab="tts">Speech TTS</button>
+      <button class="tab-btn" data-tab="translation">Speech Translation</button>
+      <button class="tab-btn" data-tab="llm-speech">LLM Speech</button>
+      <button class="tab-btn" data-tab="voice-live">Voice Live</button>
+    </nav>
+
+    <!-- Module 1: Speech STT -->
+    <div id="tab-stt" class="tab-panel active">
+      <h2>Speech to Text</h2>
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" data-subtab="realtime-stt">Realtime</button>
+        <button class="sub-tab-btn" data-subtab="fast-transcription">Fast Transcription</button>
+      </div>
+
+      <!-- Sub-panel 1.1: Realtime STT -->
+      <div id="tab-realtime-stt" class="sub-panel active">
+        <details class="code-ref">
+          <summary>Code Reference &amp; Documentation</summary>
+<pre>import azure.cognitiveservices.speech as speechsdk
+
+speech_config = speechsdk.SpeechConfig(subscription="KEY", region="REGION")
+speech_config.speech_recognition_language = "zh-CN"
+audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+recognizer.recognized.connect(lambda evt: print(evt.result.text))
+recognizer.start_continuous_recognition()
+input("Press Enter to stop...\n")
+recognizer.stop_continuous_recognition()</pre>
+          <div class="doc-links">
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/how-to-recognize-speech" target="_blank">Speech-to-Text Docs</a>
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/get-started-speech-to-text" target="_blank">Quickstart</a>
+            <a href="https://learn.microsoft.com/python/api/azure-cognitiveservices-speech/" target="_blank">Python SDK Reference</a>
+          </div>
+        </details>
+        <div class="options-row">
+          <label>Source Language
+            <select id="rt-source-language">
+              {% for code, name in language_options.items() %}
+              <option value="{{ code }}">{{ code }} — {{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label><input type="checkbox" id="rt-diarization"> Speaker Diarization</label>
+          <label>Language Detection
+            <select id="rt-lang-detect">
+              <option value="At Start" selected>At Start</option>
+              <option value="Continuous">Continuous</option>
+            </select>
+          </label>
+        </div>
+        <div id="rt-lang-select-row" class="options-row">
+          <label>Detection Languages
+            <select id="rt-languages" multiple size="4">
+              {% for code, name in language_options.items() %}
+              <option value="{{ code }}">{{ code }} — {{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="options-row full-width">
+          <label>Phrase List (one per line, improves recognition of specific words)
+            <textarea id="rt-phrase-list" rows="3" placeholder="Contoso&#10;Azure Speech&#10;GPT-4o"></textarea>
+          </label>
+        </div>
+        <div class="options-row">
+          <label><input type="radio" name="rt-source" value="mic" checked> Microphone</label>
+          <label><input type="radio" name="rt-source" value="file"> Audio File Upload</label>
+        </div>
+        <div id="rt-file-section" style="display:none">
+          <input type="file" id="rt-file-input" accept=".wav,.mp3">
+        </div>
+        <div class="button-row">
+          <button id="rt-start-btn" class="btn-primary">Start Transcription</button>
+          <button id="rt-stop-btn" class="btn-danger" style="display:none">Stop Transcription</button>
+        </div>
+        <div id="rt-status" class="status-bar"></div>
+        <pre id="rt-results" class="result-box"></pre>
+      </div>
+
+      <!-- Sub-panel 1.2: Fast Transcription -->
+      <div id="tab-fast-transcription" class="sub-panel">
+        <p class="tab-desc">Uses Azure Fast Transcription REST API for quick batch transcription.</p>
+        <details class="code-ref">
+          <summary>Code Reference &amp; Documentation</summary>
+<pre>import requests, json
+
+url = "https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15"
+headers = {"Ocp-Apim-Subscription-Key": "KEY"}
+definition = {"locales": ["zh-CN"]}
+
+with open("audio.wav", "rb") as f:
+    files = {
+        "audio": ("audio.wav", f),
+        "definition": (None, json.dumps(definition), "application/json"),
+    }
+    resp = requests.post(url, headers=headers, files=files)
+
+for phrase in resp.json()["phrases"]:
+    print(phrase["text"])</pre>
+          <div class="doc-links">
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/fast-transcription-create" target="_blank">Fast Transcription Docs</a>
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/rest-speech-to-text-short" target="_blank">REST API Reference</a>
+          </div>
+        </details>
+        <div class="options-row">
+          <label>Source Language
+            <select id="ft-source-language">
+              {% for code, name in language_options.items() %}
+              <option value="{{ code }}">{{ code }} — {{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label><input type="checkbox" id="ft-diarization"> Speaker Diarization</label>
+          <label id="ft-max-speakers-label" style="display:none">Max Speakers
+            <input type="number" id="ft-max-speakers" value="4" min="1" max="36" style="width:60px">
+          </label>
+          <label>Language Mode
+            <select id="ft-lang-detect">
+              <option value="Off">Single Language</option>
+              <option value="Select">Select Locales</option>
+            </select>
+          </label>
+        </div>
+        <div id="ft-lang-select-row" class="options-row" style="display:none">
+          <label>Locales
+            <select id="ft-languages" multiple size="4">
+              {% for code, name in language_options.items() %}
+              <option value="{{ code }}">{{ code }} — {{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="options-row full-width">
+          <label>Phrase List (one per line, improves recognition of specific words)
+            <textarea id="ft-phrase-list" rows="3" placeholder="Contoso&#10;Azure Speech&#10;GPT-4o"></textarea>
+          </label>
+        </div>
+        <input type="file" id="ft-file-input" accept=".wav,.mp3,.flac,.ogg,.wma,.aac,.webm,.amr">
+        <div class="button-row">
+          <button id="ft-start-btn" class="btn-primary">Start Transcription</button>
+        </div>
+        <div id="ft-status" class="status-bar"></div>
+        <div id="ft-combined-section" style="display:none">
+          <h3>Combined Text</h3>
+          <textarea id="ft-combined" class="result-textarea" rows="4" readonly></textarea>
+        </div>
+        <pre id="ft-results" class="result-box"></pre>
+      </div>
+    </div>
+
+    <!-- Module 2: Speech TTS -->
+    <div id="tab-tts" class="tab-panel">
+      <h2>Text to Speech</h2>
+      <p class="tab-desc">Azure Neural TTS — 支持纯文本和 SSML 模式。</p>
+      <details class="code-ref">
+        <summary>Code Reference &amp; Documentation</summary>
+<pre>import azure.cognitiveservices.speech as speechsdk
+
+speech_config = speechsdk.SpeechConfig(subscription="KEY", region="REGION")
+speech_config.speech_synthesis_voice_name = "zh-CN-XiaoxiaoNeural"
+synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
+
+# Plain text
+result = synthesizer.speak_text_async("你好，世界！").get()
+
+# SSML
+ssml = """&lt;speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="zh-CN"&gt;
+  &lt;voice name="zh-CN-XiaoxiaoNeural"&gt;你好，世界！&lt;/voice&gt;
+&lt;/speak&gt;"""
+result = synthesizer.speak_ssml_async(ssml).get()</pre>
+        <div class="doc-links">
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/how-to-speech-synthesis" target="_blank">Text-to-Speech Docs</a>
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/get-started-text-to-speech" target="_blank">Quickstart</a>
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/speech-synthesis-markup" target="_blank">SSML Reference</a>
+        </div>
+      </details>
+      <div class="options-row">
+        <label>Mode
+          <select id="tts-mode">
+            <option value="text">Plain Text</option>
+            <option value="ssml">SSML</option>
+          </select>
+        </label>
+        <label id="tts-voice-label">Voice
+          <select id="tts-voice">
+            {% for label, val in tts_voices.items() %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <textarea id="tts-input" class="result-textarea" rows="8"
+                placeholder="输入要合成的文本..."></textarea>
+      <div class="button-row">
+        <button id="tts-synthesize-btn" class="btn-primary">Synthesize</button>
+        <button id="tts-download-btn" class="btn-secondary" style="display:none">Download Audio</button>
+      </div>
+      <div id="tts-status" class="status-bar"></div>
+      <audio id="tts-audio-player" style="display:none" controls></audio>
+    </div>
+
+    <!-- Module 3: Speech Translation -->
+    <div id="tab-translation" class="tab-panel">
+      <h2>Speech Translation</h2>
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" data-subtab="speech-translate">Translate</button>
+        <button class="sub-tab-btn" data-subtab="live-interpreter">Live Interpreter</button>
+      </div>
+
+      <!-- Sub-panel 3.1: Speech Translate -->
+      <div id="tab-speech-translate" class="sub-panel active">
+        <p class="tab-desc">Real-time speech translation using Azure Speech SDK TranslationRecognizer.</p>
+        <details class="code-ref">
+          <summary>Code Reference &amp; Documentation</summary>
+<pre>import azure.cognitiveservices.speech as speechsdk
+
+translation_config = speechsdk.translation.SpeechTranslationConfig(
+    subscription="KEY", region="REGION",
+    speech_recognition_language="zh-CN",
+    target_languages=["en", "ja"])
+audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+
+recognizer = speechsdk.translation.TranslationRecognizer(
+    translation_config=translation_config, audio_config=audio_config)
+
+def on_recognized(evt):
+    print(f"Original: {evt.result.text}")
+    for lang, text in evt.result.translations.items():
+        print(f"  [{lang}]: {text}")
+
+recognizer.recognized.connect(on_recognized)
+recognizer.start_continuous_recognition()
+input("Press Enter to stop...\n")
+recognizer.stop_continuous_recognition()</pre>
+          <div class="doc-links">
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/get-started-speech-translation" target="_blank">Speech Translation Docs</a>
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/how-to-translate-speech" target="_blank">How-to Guide</a>
+          </div>
+        </details>
+        <div class="options-row">
+          <label>Source Language
+            <select id="st-source-language">
+              {% for code, name in language_options.items() %}
+              <option value="{{ code }}">{{ code }} — {{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>Target Languages
+            <select id="st-target-langs" multiple size="5">
+              {% for name, code in translation_targets.items() %}
+              <option value="{{ name }}" {% if name == "English" %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="options-row">
+          <label><input type="radio" name="st-source" value="mic" checked> Microphone</label>
+          <label><input type="radio" name="st-source" value="file"> Audio File Upload</label>
+        </div>
+        <div id="st-file-section" style="display:none">
+          <input type="file" id="st-file-input" accept=".wav,.mp3">
+        </div>
+        <div class="button-row">
+          <button id="st-start-btn" class="btn-primary">Start Translation</button>
+          <button id="st-stop-btn" class="btn-danger" style="display:none">Stop Translation</button>
+        </div>
+        <div id="st-status" class="status-bar"></div>
+        <div id="st-results" class="result-box"></div>
+      </div>
+
+      <!-- Sub-panel 3.2: Live Interpreter -->
+      <div id="tab-live-interpreter" class="sub-panel">
+        <p class="tab-desc">Real-time speech-to-speech translation with automatic language detection.</p>
+        <details class="code-ref">
+          <summary>Code Reference &amp; Documentation</summary>
+<pre>import azure.cognitiveservices.speech as speechsdk
+
+endpoint = "wss://{region}.stt.speech.microsoft.com/speech/universal/v2"
+translation_config = speechsdk.translation.SpeechTranslationConfig(
+    endpoint=endpoint, subscription="KEY")
+translation_config.add_target_language("en")
+translation_config.voice_name = "en-US-AvaMultilingualNeural"  # or "personal-voice"
+
+auto_detect = speechsdk.languageconfig.AutoDetectSourceLanguageConfig()
+audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+
+recognizer = speechsdk.translation.TranslationRecognizer(
+    translation_config=translation_config,
+    audio_config=audio_config,
+    auto_detect_source_language_config=auto_detect)
+
+recognizer.recognized.connect(lambda evt: print(evt.result.translations))
+recognizer.synthesizing.connect(lambda evt: print(f"Audio: {len(evt.result.audio)} bytes"))
+recognizer.start_continuous_recognition()</pre>
+          <div class="doc-links">
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/how-to-translate-speech" target="_blank">Speech Translation Docs</a>
+            <a href="https://learn.microsoft.com/azure/ai-services/speech-service/personal-voice-overview" target="_blank">Personal Voice</a>
+          </div>
+        </details>
+        <div class="options-row">
+          <label>Target Language
+            <select id="li-target-lang">
+              {% for name, code in translation_targets.items() %}
+              <option value="{{ name }}">{{ name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>Voice Mode
+            <select id="li-voice-mode">
+              <option value="Personal Voice (clone speaker)">Personal Voice (clone speaker)</option>
+              <option value="Standard TTS Voice">Standard TTS Voice</option>
+            </select>
+          </label>
+        </div>
+        <div class="options-row">
+          <label><input type="radio" name="li-source" value="mic" checked> Microphone</label>
+          <label><input type="radio" name="li-source" value="file"> Audio File Upload</label>
+        </div>
+        <div id="li-file-section" style="display:none">
+          <input type="file" id="li-file-input" accept=".wav,.mp3">
+        </div>
+        <div class="button-row">
+          <button id="li-start-btn" class="btn-primary">Start Live Interpreter</button>
+          <button id="li-pause-btn" class="btn-secondary" style="display:none">Pause</button>
+          <button id="li-resume-btn" class="btn-secondary" style="display:none">Resume</button>
+          <button id="li-stop-btn" class="btn-danger" style="display:none">Stop</button>
+          <button id="li-download-btn" class="btn-secondary" style="display:none">Download Audio</button>
+        </div>
+        <div id="li-status" class="status-bar"></div>
+        <div id="li-interim" class="interim-text"></div>
+        <div id="li-results" class="result-box"></div>
+        <div id="li-audio-container" style="display:none">
+          <h3>Translated Audio</h3>
+          <audio id="li-audio-player" controls></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 5: Voice Live -->
+    <div id="tab-voice-live" class="tab-panel">
+      <h2>Voice Live</h2>
+      <p class="tab-desc">Real-time voice conversation with AI using Azure Voice Live API.</p>
+      <details class="code-ref">
+        <summary>Code Reference &amp; Documentation</summary>
+<pre>import asyncio
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.voicelive.aio import connect
+from azure.ai.voicelive.models import (
+    Modality, RequestSession, ServerVad, ServerEventType,
+    InputAudioFormat, OutputAudioFormat,
+)
+
+async def main():
+    credential = AzureKeyCredential("KEY")
+    async with connect(
+        endpoint="ENDPOINT", credential=credential, model="gpt-4o-mini"
+    ) as conn:
+        await conn.session.update(session=RequestSession(
+            modalities=[Modality.TEXT, Modality.AUDIO],
+            instructions="You are a helpful assistant.",
+            voice="alloy",
+            input_audio_format=InputAudioFormat.PCM16,
+            output_audio_format=OutputAudioFormat.PCM16,
+            turn_detection=ServerVad(),
+        ))
+        async for event in conn:
+            if event.type == ServerEventType.RESPONSE_AUDIO_TRANSCRIPT_DELTA:
+                print(event.delta, end="", flush=True)
+
+asyncio.run(main())</pre>
+        <div class="doc-links">
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/voice-live-overview" target="_blank">Voice Live Overview</a>
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/voice-live-quickstart" target="_blank">Quickstart</a>
+          <a href="https://pypi.org/project/azure-ai-voicelive/" target="_blank">PyPI: azure-ai-voicelive</a>
+        </div>
+      </details>
+      <div class="options-row">
+        <label>Model Tier
+          <select id="vl-model-tier">
+            {% for tier in vl_model_tiers.keys() %}
+            <option value="{{ tier }}">{{ tier }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Model
+          <select id="vl-model"></select>
+        </label>
+      </div>
+      <div class="options-row">
+        <label>Voice Provider
+          <select id="vl-voice-provider">
+            {% for provider in vl_voice_providers.keys() %}
+            <option value="{{ provider }}">{{ provider }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Voice
+          <select id="vl-voice"></select>
+        </label>
+      </div>
+      <div class="options-row">
+        <label>Target Language
+          <select id="vl-target-language">
+            {% for label, val in vl_target_languages.items() %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>ASR Model
+          <select id="vl-asr-model">
+            {% for m in vl_asr_models %}
+            <option value="{{ m }}">{{ m }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <div class="options-row full-width">
+        <label>System Instructions
+          <textarea id="vl-instructions" rows="3">You are a helpful AI assistant. Respond naturally and conversationally. Keep your responses concise but engaging.</textarea>
+        </label>
+      </div>
+      <div class="button-row">
+        <button id="vl-start-btn" class="btn-primary">Start Voice Live</button>
+        <button id="vl-stop-btn" class="btn-danger" style="display:none">Stop Voice Live</button>
+      </div>
+      <div id="vl-status" class="status-bar"></div>
+      <div id="vl-conversation" class="result-box conversation-box"></div>
+      <details id="vl-stats-panel" style="margin-top:8px">
+        <summary>Usage Statistics</summary>
+        <div class="vl-stats-grid">
+          <div class="vl-stats-section-title" style="border-top:none;margin-top:0">Current Response</div>
+          <div class="vl-stat-row"><span class="vl-stat-label">Total tokens</span><span class="vl-stat-value" id="vl-stat-total">0</span></div>
+          <div class="vl-stat-row"><span class="vl-stat-label">Input tokens</span><span class="vl-stat-value" id="vl-stat-input">0</span></div>
+          <div class="vl-stat-row vl-stat-detail"><span class="vl-stat-label">Text</span><span class="vl-stat-value" id="vl-stat-input-text">0</span></div>
+          <div class="vl-stat-row vl-stat-detail"><span class="vl-stat-label">Audio</span><span class="vl-stat-value" id="vl-stat-input-audio">0</span></div>
+          <div class="vl-stat-row vl-stat-detail"><span class="vl-stat-label">Cached</span><span class="vl-stat-value" id="vl-stat-input-cached">0</span></div>
+          <div class="vl-stat-row"><span class="vl-stat-label">Output tokens</span><span class="vl-stat-value" id="vl-stat-output">0</span></div>
+          <div class="vl-stat-row vl-stat-detail"><span class="vl-stat-label">Text</span><span class="vl-stat-value" id="vl-stat-output-text">0</span></div>
+          <div class="vl-stat-row vl-stat-detail"><span class="vl-stat-label">Audio</span><span class="vl-stat-value" id="vl-stat-output-audio">0</span></div>
+          <div class="vl-stats-section-title">Cumulative</div>
+          <div class="vl-stat-row"><span class="vl-stat-label">Total tokens</span><span class="vl-stat-value" id="vl-stat-cum-total">0</span></div>
+          <div class="vl-stat-row"><span class="vl-stat-label">Input tokens</span><span class="vl-stat-value" id="vl-stat-cum-input">0</span></div>
+          <div class="vl-stat-row"><span class="vl-stat-label">Output tokens</span><span class="vl-stat-value" id="vl-stat-cum-output">0</span></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Module 4: LLM Speech -->
+    <div id="tab-llm-speech" class="tab-panel">
+      <h2>LLM Speech (Transcribe &amp; Translate)</h2>
+      <p class="tab-desc">Uses Azure LLM Speech API — an LLM-enhanced speech model for improved quality.</p>
+      <details class="code-ref">
+        <summary>Code Reference &amp; Documentation</summary>
+<pre>import requests, json
+
+url = "https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15"
+headers = {"Ocp-Apim-Subscription-Key": "KEY"}
+
+# Transcribe (set task to "translate" for translation)
+definition = {
+    "enhancedMode": {
+        "enabled": True,
+        "task": "transcribe",           # or "translate"
+        # "targetLanguage": "en",       # required for translate
+        # "prompt": ["Output in lexical format."],
+    }
+}
+
+with open("audio.wav", "rb") as f:
+    files = {
+        "audio": ("audio.wav", f),
+        "definition": (None, json.dumps(definition), "application/json"),
+    }
+    resp = requests.post(url, headers=headers, files=files)
+
+print(resp.json()["combinedPhrases"][0]["text"])</pre>
+        <div class="doc-links">
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/fast-transcription-create" target="_blank">Fast Transcription API Docs</a>
+          <a href="https://learn.microsoft.com/azure/ai-services/speech-service/rest-speech-to-text-short" target="_blank">REST API Reference</a>
+        </div>
+      </details>
+      <input type="file" id="llm-file-input" accept=".wav,.mp3,.flac,.ogg,.wma,.aac,.webm">
+      <div class="options-row">
+        <label>Target Language (for Translate)
+          <select id="llm-target-lang">
+            {% for name in llm_targets.keys() %}
+            <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Prompt (optional)
+          <input type="text" id="llm-prompt" placeholder='e.g. "Output must be in lexical format."'>
+        </label>
+      </div>
+      <div class="button-row">
+        <button id="llm-transcribe-btn" class="btn-primary">Transcribe</button>
+        <button id="llm-translate-btn" class="btn-primary">Translate</button>
+      </div>
+      <div id="llm-status" class="status-bar"></div>
+      <div id="llm-transcript-section" style="display:none">
+        <h3>Transcription Result</h3>
+        <textarea id="llm-transcript" class="result-textarea" rows="8" readonly></textarea>
+        <div id="llm-phrases-section" style="display:none">
+          <details>
+            <summary>Phrase-level details</summary>
+            <div id="llm-phrases"></div>
+          </details>
+        </div>
+      </div>
+      <div id="llm-translation-section" style="display:none">
+        <h3 id="llm-translation-header">Translation Result</h3>
+        <textarea id="llm-translation" class="result-textarea" rows="8" readonly></textarea>
+        <button id="llm-read-aloud-btn" class="btn-secondary">Read Translation Aloud</button>
+        <audio id="llm-audio-player" style="display:none" controls></audio>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="application/json" id="vl-model-tiers-data">{{ vl_model_tiers | tojson }}</script>
+  <script type="application/json" id="vl-voice-providers-data">{{ vl_voice_providers | tojson }}</script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="/static/js/socket_manager.js"></script>
+  <script src="/static/js/audio.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/tabs/realtime_stt.js"></script>
+  <script src="/static/js/tabs/fast_transcription.js"></script>
+  <script src="/static/js/tabs/speech_translate.js"></script>
+  <script src="/static/js/tabs/live_interpreter.js"></script>
+  <script src="/static/js/tabs/voice_live.js"></script>
+  <script src="/static/js/tabs/llm_speech.js"></script>
+  <script src="/static/js/tabs/tts.js"></script>
+</body>
+</html>
