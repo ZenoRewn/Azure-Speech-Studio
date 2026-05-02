@@ -1,0 +1,112 @@
+      <!-- ================= 1. Speech STT ================= -->
+      <div id="tab-stt" class="tab-panel active">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Speech to Text</h3>
+              <span class="subtitle">Real-time streaming or batch transcription with diarization and phrase hints.</span>
+            </div>
+            <div class="sub-tabs">
+              <button class="sub-tab-btn active" data-subtab="realtime-stt">Realtime</button>
+              <button class="sub-tab-btn" data-subtab="fast-transcription">Fast</button>
+            </div>
+          </div>
+
+          <!-- Realtime STT sub-panel -->
+          <div id="tab-realtime-stt" class="sub-panel active col">
+            <details class="code-reference"><summary>Code Reference & Documentation</summary>
+              <div class="doc-body">
+<pre>import azure.cognitiveservices.speech as speechsdk
+speech_config = speechsdk.SpeechConfig(subscription="KEY", region="REGION")
+recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config,
+    audio_config=speechsdk.audio.AudioConfig(use_default_microphone=True))
+recognizer.recognized.connect(lambda evt: print(evt.result.text))
+recognizer.start_continuous_recognition()</pre>
+                <div class="row"><a href="https://learn.microsoft.com/azure/ai-services/speech-service/how-to-recognize-speech" target="_blank">Docs</a></div>
+              </div>
+            </details>
+            <div class="option-row">
+              <div class="option-group"><label>Source Language</label>
+                <select id="rt-source-language">
+                  {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="option-group"><label>Detection Mode</label>
+                <select id="rt-lang-detect"><option value="At Start" selected>At Start</option><option value="Continuous">Continuous</option></select>
+              </div>
+              <div class="option-group"><label>&nbsp;</label>
+                <label class="checkbox-row"><input type="checkbox" id="rt-diarization"> Speaker Diarization</label>
+              </div>
+            </div>
+            <div id="rt-lang-select-row" class="option-row">
+              <div class="option-group"><label>Detection Languages</label>
+                <select id="rt-languages" multiple size="4">
+                  {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="option-group"><label>Phrase List (one per line)</label>
+              <textarea id="rt-phrase-list" rows="3" placeholder="Contoso&#10;Azure Speech&#10;GPT-4o"></textarea>
+            </div>
+            <div class="row">
+              <label class="radio-row"><input type="radio" name="rt-source" value="mic" checked> Microphone</label>
+              <label class="radio-row"><input type="radio" name="rt-source" value="file"> Audio File</label>
+            </div>
+            <div id="rt-file-section" class="hidden"><input type="file" id="rt-file-input" accept=".wav,.mp3"></div>
+            <div class="button-row">
+              <button id="rt-start-btn" class="btn primary shimmer">Start Transcription</button>
+              <button id="rt-stop-btn" class="btn danger hidden">Stop</button>
+            </div>
+            <div id="rt-status" class="status-bar"></div>
+            <pre id="rt-results" class="result-box"></pre>
+          </div>
+
+          <!-- Fast Transcription sub-panel -->
+          <div id="tab-fast-transcription" class="sub-panel col">
+            <p class="muted">Azure Fast Transcription REST API — quick batch transcription with optional diarization.</p>
+            <details class="code-reference"><summary>Code Reference & Documentation</summary>
+              <div class="doc-body">
+<pre>import requests, json
+url = "https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15"
+files = {"audio": ("a.wav", open("a.wav","rb")), "definition": (None, json.dumps({"locales":["zh-CN"]}), "application/json")}
+resp = requests.post(url, headers={"Ocp-Apim-Subscription-Key": "KEY"}, files=files)</pre>
+              </div>
+            </details>
+            <div class="option-row">
+              <div class="option-group"><label>Source Language</label>
+                <select id="ft-source-language">
+                  {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="option-group"><label>Diarization</label>
+                <label class="checkbox-row"><input type="checkbox" id="ft-diarization"> Enable</label>
+              </div>
+              <div class="option-group" id="ft-max-speakers-label" style="display:none"><label>Max Speakers</label>
+                <input type="number" id="ft-max-speakers" value="4" min="1" max="36">
+              </div>
+              <div class="option-group"><label>Language Mode</label>
+                <select id="ft-lang-detect"><option value="Off">Single Language</option><option value="Select">Multi-Locale Detect</option></select>
+              </div>
+            </div>
+            <div id="ft-lang-select-row" class="option-row hidden">
+              <div class="option-group"><label>Locales</label>
+                <select id="ft-languages" multiple size="4">
+                  {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="option-group"><label>Phrase List</label>
+              <textarea id="ft-phrase-list" rows="3" placeholder="Contoso&#10;Azure Speech&#10;GPT-4o"></textarea>
+            </div>
+            <input type="file" id="ft-file-input" accept=".wav,.mp3,.flac,.ogg,.wma,.aac,.webm,.amr">
+            <div class="button-row">
+              <button id="ft-start-btn" class="btn primary shimmer">Start Transcription</button>
+            </div>
+            <div id="ft-status" class="status-bar"></div>
+            <div id="ft-combined-section" class="hidden"><h4>Combined Text</h4>
+              <textarea id="ft-combined" class="result-box" rows="4" readonly></textarea>
+            </div>
+            <pre id="ft-results" class="result-box"></pre>
+          </div>
+        </div>
+      </div>

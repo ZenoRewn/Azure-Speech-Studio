@@ -1,0 +1,14 @@
+/* Aurora design system — single entry point. */
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@500,700,400&display=swap");
+
+@import "tokens.css";
+@import "base.css";
+@import "aurora.css";
+@import "components.css";
+@import "effects.css";
+@import "theme.css";
+
+/* Shared SVG gradient definition used by .ring-progress — injected via JS, but kept here
+   for backup in case JS fails to run. */

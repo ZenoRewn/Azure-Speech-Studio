@@ -1,0 +1,92 @@
+      <!-- ================= 3. Speech Translation ================= -->
+      <div id="tab-translation" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Speech Translation</h3>
+              <span class="subtitle">Real-time translation and speech-to-speech live interpreter.</span>
+            </div>
+            <div class="sub-tabs">
+              <button class="sub-tab-btn active" data-subtab="speech-translate">Translate</button>
+              <button class="sub-tab-btn" data-subtab="live-interpreter">Live Interpreter</button>
+            </div>
+          </div>
+
+          <!-- Speech Translate sub-panel -->
+          <div id="tab-speech-translate" class="sub-panel active col">
+            <details class="code-reference"><summary>Code Reference & Documentation</summary>
+              <div class="doc-body">
+<pre>translation_config = speechsdk.translation.SpeechTranslationConfig(
+    subscription="KEY", region="REGION",
+    speech_recognition_language="zh-CN", target_languages=["en","ja"])</pre>
+              </div>
+            </details>
+            <div class="option-row">
+              <div class="option-group"><label>Source Language</label>
+                <select id="st-source-language">
+                  {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="option-group"><label>Target Languages</label>
+                <select id="st-target-langs" multiple size="5">
+                  {% for name, code in translation_targets.items() %}<option value="{{ name }}" {% if name == "English" %}selected{% endif %}>{{ name }}</option>{% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <label class="radio-row"><input type="radio" name="st-source" value="mic" checked> Microphone</label>
+              <label class="radio-row"><input type="radio" name="st-source" value="file"> Audio File</label>
+            </div>
+            <div id="st-file-section" class="hidden"><input type="file" id="st-file-input" accept=".wav,.mp3"></div>
+            <div class="button-row">
+              <button id="st-start-btn" class="btn primary shimmer">Start Translation</button>
+              <button id="st-stop-btn" class="btn danger hidden">Stop</button>
+            </div>
+            <div id="st-status" class="status-bar"></div>
+            <div id="st-results" class="result-box"></div>
+          </div>
+
+          <!-- Live Interpreter sub-panel -->
+          <div id="tab-live-interpreter" class="sub-panel col">
+            <p class="muted">Real-time speech-to-speech translation with automatic language detection.</p>
+            <details class="code-reference"><summary>Code Reference & Documentation</summary>
+              <div class="doc-body">
+<pre>translation_config.voice_name = "en-US-AvaMultilingualNeural"  # or "personal-voice"
+recognizer.synthesizing.connect(lambda evt: print(len(evt.result.audio)))</pre>
+              </div>
+            </details>
+            <div class="option-row">
+              <div class="option-group"><label>Target Language</label>
+                <select id="li-target-lang">
+                  {% for name, code in translation_targets.items() %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="option-group"><label>Voice Mode</label>
+                <select id="li-voice-mode">
+                  <option value="Personal Voice (clone speaker)">Personal Voice (clone speaker)</option>
+                  <option value="Standard TTS Voice">Standard TTS Voice</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <label class="radio-row"><input type="radio" name="li-source" value="mic" checked> Microphone</label>
+              <label class="radio-row"><input type="radio" name="li-source" value="file"> Audio File</label>
+            </div>
+            <div id="li-file-section" class="hidden"><input type="file" id="li-file-input" accept=".wav,.mp3"></div>
+            <div class="button-row">
+              <button id="li-start-btn" class="btn primary shimmer">Start Live Interpreter</button>
+              <button id="li-pause-btn" class="btn secondary hidden">Pause</button>
+              <button id="li-resume-btn" class="btn secondary hidden">Resume</button>
+              <button id="li-stop-btn" class="btn danger hidden">Stop</button>
+              <button id="li-download-btn" class="btn secondary hidden">Download Audio</button>
+            </div>
+            <div id="li-status" class="status-bar"></div>
+            <div id="li-interim" class="muted"></div>
+            <div id="li-results" class="result-box"></div>
+            <div id="li-audio-container" class="hidden col">
+              <h4>Translated Audio</h4>
+              <audio id="li-audio-player" controls></audio>
+            </div>
+          </div>
+        </div>
+      </div>

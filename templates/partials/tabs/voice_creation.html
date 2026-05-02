@@ -1,0 +1,73 @@
+      <!-- ================= 11. Voice Creation ================= -->
+      <div id="tab-voice-creation" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Voice Creation · Personal Voice</h3>
+              <span class="subtitle">Create a custom voice from consent + training audio in 4 guided steps.</span>
+            </div>
+          </div>
+          <div id="vc-stepper" class="stepper">
+            <div class="step active" data-step="1"><span class="step-index">1</span><div><strong>Project</strong><br><small class="muted">Name + locale</small></div></div>
+            <div class="step" data-step="2"><span class="step-index">2</span><div><strong>Consent</strong><br><small class="muted">Record statement</small></div></div>
+            <div class="step" data-step="3"><span class="step-index">3</span><div><strong>Training</strong><br><small class="muted">Upload samples</small></div></div>
+            <div class="step" data-step="4"><span class="step-index">4</span><div><strong>Submit</strong><br><small class="muted">Start training</small></div></div>
+          </div>
+
+          <div id="vc-step-1" class="vc-step col">
+            <div class="option-row">
+              <div class="option-group"><label>Project Name</label>
+                <input type="text" id="vc-project-name" placeholder="my-voice-project">
+              </div>
+              <div class="option-group"><label>Voice Talent Name</label>
+                <input type="text" id="vc-voice-name" placeholder="Jane Doe">
+              </div>
+              <div class="option-group"><label>Company Name</label>
+                <input type="text" id="vc-company-name" placeholder="Contoso">
+              </div>
+              <div class="option-group"><label>Locale</label>
+                <select id="vc-locale">{% for loc in personal_voice_locales %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}</select>
+              </div>
+              <div class="option-group"><label>Base Model</label>
+                <select id="vc-model-id">{% for m in personal_voice_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
+              </div>
+            </div>
+          </div>
+
+          <div id="vc-step-2" class="vc-step col hidden">
+            <p class="muted">The voice talent must read the following consent statement, and you upload that recording here:</p>
+            <div class="result-box" id="vc-consent-text" style="min-height:auto"></div>
+            <label class="option-group"><span>Consent Audio (.wav)</span>
+              <input type="file" id="vc-consent-file" accept="audio/*">
+            </label>
+          </div>
+
+          <div id="vc-step-3" class="vc-step col hidden">
+            <p class="muted">Upload at least 20 training audio samples (30s–10min each, consistent speaker, quiet environment).</p>
+            <input type="file" id="vc-training-files" accept="audio/*" multiple>
+            <div id="vc-training-list" class="col"></div>
+          </div>
+
+          <div id="vc-step-4" class="vc-step col hidden">
+            <div class="option-group"><label>Description (optional)</label>
+              <textarea id="vc-description" rows="2"></textarea>
+            </div>
+            <p class="muted">Clicking Submit uploads consent + training data and starts training.</p>
+          </div>
+
+          <div class="button-row">
+            <button id="vc-prev-btn" class="btn ghost" disabled>Previous</button>
+            <button id="vc-next-btn" class="btn primary shimmer">Next</button>
+            <button id="vc-submit-btn" class="btn primary shimmer hidden">Submit Training</button>
+          </div>
+          <div id="vc-status" class="status-bar"></div>
+
+          <details class="code-reference" open><summary>Existing Voices</summary>
+            <div class="doc-body col">
+              <button id="vc-refresh-voices-btn" class="btn ghost">Refresh List</button>
+              <div id="vc-voices-list" class="col"></div>
+            </div>
+          </details>
+        </div>
+        <script type="application/json" id="vc-consent-template">{{ personal_voice_consent_template | tojson }}</script>
+      </div>

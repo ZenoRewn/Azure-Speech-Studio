@@ -1,0 +1,14 @@
+flask
+flask-socketio
+azure-cognitiveservices-speech
+python-dotenv
+openai
+requests
+numpy
+azure-ai-voicelive[aiohttp]
+azure-storage-blob
+gunicorn
+gevent
+gevent-websocket
+structlog
+python-multipart

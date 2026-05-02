@@ -1,0 +1,48 @@
+      <!-- ================= 6. Voice Live Translator ================= -->
+      <div id="tab-voice-live-translator" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Voice Live Translator</h3>
+              <span class="subtitle">Real-time interpretation via Voice Live — speak naturally, hear the translation.</span>
+            </div>
+          </div>
+          <div class="option-row">
+            <div class="option-group"><label>Model</label>
+              <select id="vlt-model"><option value="gpt-4o-mini">gpt-4o-mini</option><option value="gpt-4o">gpt-4o</option><option value="gpt-realtime-mini">gpt-realtime-mini</option><option value="gpt-realtime">gpt-realtime</option></select>
+            </div>
+            <div class="option-group"><label>Voice Provider</label>
+              <select id="vlt-voice-provider">{% for p in vl_voice_providers.keys() %}<option value="{{ p }}">{{ p }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>Voice</label><select id="vlt-voice"></select></div>
+            <div class="option-group"><label>ASR Model</label>
+              <select id="vlt-asr-model">{% for m in vl_asr_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
+            </div>
+          </div>
+          <div class="option-row">
+            <div class="option-group"><label>Target Language</label>
+              <select id="vlt-target-language">
+                <option value="English">English</option><option value="Chinese">Chinese</option><option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option><option value="French">French</option><option value="German">German</option>
+                <option value="Spanish">Spanish</option><option value="Italian">Italian</option><option value="Portuguese">Portuguese</option>
+                <option value="Russian">Russian</option><option value="Arabic">Arabic</option><option value="Hindi">Hindi</option>
+              </select>
+            </div>
+            <div class="option-group"><label>Source Language (optional)</label>
+              <select id="vlt-source-language">
+                <option value="">Auto-detect</option>
+                {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="option-group"><label>Instructions (optional override)</label>
+            <textarea id="vlt-instructions" rows="2" placeholder="Leave empty to use the default translator instructions."></textarea>
+          </div>
+          <div class="button-row">
+            <button id="vlt-start-btn" class="btn primary shimmer">Start Translator</button>
+            <button id="vlt-stop-btn" class="btn danger hidden">Stop</button>
+          </div>
+          <div id="vlt-status" class="status-bar"></div>
+          <div id="vlt-conversation" class="conversation"></div>
+        </div>
+      </div>

@@ -1,0 +1,49 @@
+      <!-- ================= 4. LLM Speech ================= -->
+      <div id="tab-llm-speech" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>LLM Speech</h3>
+              <span class="subtitle">LLM-enhanced transcription and translation for higher quality and prompt guidance.</span>
+            </div>
+          </div>
+          <details class="code-reference"><summary>Code Reference & Documentation</summary>
+            <div class="doc-body">
+<pre>definition = {"enhancedMode": {"enabled": True, "task": "transcribe"}}  # or "translate" with targetLanguage</pre>
+            </div>
+          </details>
+          <input type="file" id="llm-file-input" accept=".wav,.mp3,.flac,.ogg,.wma,.aac,.webm">
+          <div class="option-row">
+            <div class="option-group"><label>Target Language (for Translate)</label>
+              <select id="llm-target-lang">
+                {% for name in llm_targets.keys() %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="option-group"><label>Prompt (optional)</label>
+              <input type="text" id="llm-prompt" placeholder='e.g. "Output must be in lexical format."'>
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="llm-transcribe-btn" class="btn primary shimmer">Transcribe</button>
+            <button id="llm-translate-btn" class="btn primary shimmer">Translate</button>
+          </div>
+          <div id="llm-status" class="status-bar"></div>
+          <div id="llm-transcript-section" class="hidden col">
+            <h4>Transcription Result</h4>
+            <textarea id="llm-transcript" class="result-box" rows="8" readonly></textarea>
+            <div id="llm-phrases-section" class="hidden">
+              <details class="code-reference"><summary>Phrase-level details</summary>
+                <div id="llm-phrases" class="doc-body"></div>
+              </details>
+            </div>
+          </div>
+          <div id="llm-translation-section" class="hidden col">
+            <h4 id="llm-translation-header">Translation Result</h4>
+            <textarea id="llm-translation" class="result-box" rows="8" readonly></textarea>
+            <div class="button-row">
+              <button id="llm-read-aloud-btn" class="btn secondary">Read Translation Aloud</button>
+            </div>
+            <audio id="llm-audio-player" class="hidden" controls></audio>
+          </div>
+        </div>
+      </div>

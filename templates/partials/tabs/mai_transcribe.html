@@ -1,0 +1,42 @@
+      <!-- ================= 7. MAI-Transcribe ================= -->
+      <div id="tab-mai-transcribe" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>MAI-Transcribe</h3>
+              <span class="subtitle">Enhanced transcription with the MAI-Transcribe-1 model across 25 locales.</span>
+            </div>
+          </div>
+          <details class="code-reference"><summary>Code Reference & Documentation</summary>
+            <div class="doc-body">
+<pre>definition = {"locales": ["en-US"], "enhancedMode": {"enabled": True, "task": "transcribe", "model": "mai-transcribe-1"}}</pre>
+            </div>
+          </details>
+          <div class="option-row">
+            <div class="option-group"><label>Locales (multi-select)</label>
+              <select id="mai-locales" multiple size="6">
+                {% for loc in mai_transcribe_languages %}<option value="{{ loc }}" {% if loc == 'en-US' %}selected{% endif %}>{{ loc }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="option-group"><label>Diarization</label>
+              <label class="checkbox-row"><input type="checkbox" id="mai-diarization"> Enable</label>
+            </div>
+            <div class="option-group"><label>Max Speakers</label>
+              <input type="number" id="mai-max-speakers" value="4" min="1" max="36">
+            </div>
+          </div>
+          <div class="option-group"><label>Phrase List (comma-separated)</label>
+            <input type="text" id="mai-phrase-list" placeholder="Contoso, Azure Speech">
+          </div>
+          <input type="file" id="mai-file-input" accept=".wav,.mp3,.flac,.ogg,.webm,.m4a">
+          <div class="button-row">
+            <button id="mai-start-btn" class="btn primary shimmer">Transcribe</button>
+          </div>
+          <div id="mai-status" class="status-bar"></div>
+          <div id="mai-combined-section" class="col hidden">
+            <h4>Combined Text</h4>
+            <textarea id="mai-combined" class="result-box" rows="3" readonly></textarea>
+          </div>
+          <pre id="mai-results" class="result-box"></pre>
+        </div>
+      </div>

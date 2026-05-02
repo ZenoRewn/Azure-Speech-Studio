@@ -1,0 +1,46 @@
+      <!-- ================= 13. Podcast Agent ================= -->
+      <div id="tab-podcast-agent" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Podcast Agent</h3>
+              <span class="subtitle">Generate AI-hosted podcasts from plain text — choose style, host count, length.</span>
+            </div>
+          </div>
+          <p class="muted">Supported regions: <span class="mono">{{ podcast_regions | join(', ') }}</span>.</p>
+          <div class="option-row">
+            <div class="option-group"><label>Locale</label>
+              <select id="pa-locale">{% for loc in podcast_locales %}<option value="{{ loc }}" {% if loc == 'en-US' %}selected{% endif %}>{{ loc }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>Host Type</label>
+              <select id="pa-host-type">{% for h in podcast_host_types %}<option value="{{ h }}">{{ h }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>Style</label>
+              <select id="pa-style">{% for s in podcast_styles %}<option value="{{ s }}">{{ s }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>Length</label>
+              <select id="pa-length">{% for l in podcast_lengths %}<option value="{{ l }}" {% if l == 'Medium' %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+            </div>
+          </div>
+          <div class="option-group"><label>Title (optional)</label>
+            <input type="text" id="pa-title" placeholder="My podcast episode">
+          </div>
+          <div class="option-group"><label>Source Content</label>
+            <textarea id="pa-content" rows="10" placeholder="Paste the source text or outline for your podcast..."></textarea>
+          </div>
+          <div class="button-row">
+            <button id="pa-start-btn" class="btn primary shimmer">Generate Podcast</button>
+            <button id="pa-stop-btn" class="btn danger hidden">Cancel</button>
+            <div class="waveform hidden" id="pa-waveform"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div id="pa-status" class="status-bar"></div>
+          <div id="pa-result-section" class="col hidden">
+            <audio id="pa-audio-player" controls></audio>
+            <div class="row">
+              <a id="pa-audio-link" class="btn secondary" href="#" target="_blank">Download Audio</a>
+              <a id="pa-transcript-link" class="btn ghost hidden" href="#" target="_blank">Transcript</a>
+              <a id="pa-script-link" class="btn ghost hidden" href="#" target="_blank">Script</a>
+            </div>
+          </div>
+        </div>
+      </div>

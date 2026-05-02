@@ -1,0 +1,35 @@
+      <!-- ================= 9. Multi-Talker TTS ================= -->
+      <div id="tab-multi-talker-tts" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Multi-Talker TTS</h3>
+              <span class="subtitle">DragonHD mstts:dialog — lifelike multi-speaker dialog synthesis.</span>
+            </div>
+          </div>
+          <div class="option-row">
+            <div class="option-group"><label>Locale Preset</label>
+              <select id="mt-locale">
+                {% for loc, cfg in multi_talker_presets.items() %}<option value="{{ loc }}">{{ loc }} · {{ cfg.speakers | join(' / ') }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="option-group"><label>Voice Name</label>
+              <input type="text" id="mt-voice-name" readonly>
+            </div>
+          </div>
+          <div class="option-group"><label>Dialog Script (one "Speaker: text" per line)</label>
+            <textarea id="mt-content" rows="8" placeholder="Ava: Good morning!&#10;Andrew: Hi, how can I help you today?"></textarea>
+          </div>
+          <div class="button-row">
+            <button id="mt-preview-btn" class="btn ghost">Preview SSML</button>
+            <button id="mt-synthesize-btn" class="btn primary shimmer">Synthesize</button>
+            <button id="mt-download-btn" class="btn secondary hidden">Download</button>
+          </div>
+          <details class="code-reference" id="mt-ssml-panel"><summary>SSML Preview</summary>
+            <div class="doc-body"><pre id="mt-ssml"></pre></div>
+          </details>
+          <div id="mt-status" class="status-bar"></div>
+          <audio id="mt-audio-player" class="hidden" controls></audio>
+        </div>
+        <script type="application/json" id="mt-presets-data">{{ multi_talker_presets | tojson }}</script>
+      </div>

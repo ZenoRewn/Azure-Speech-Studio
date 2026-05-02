@@ -1,0 +1,35 @@
+      <!-- ================= 2. Speech TTS ================= -->
+      <div id="tab-tts" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Text to Speech</h3>
+              <span class="subtitle">Azure Neural TTS — plain text or SSML, 14 voices out of the box.</span>
+            </div>
+          </div>
+          <details class="code-reference"><summary>Code Reference & Documentation</summary>
+            <div class="doc-body">
+<pre>speech_config.speech_synthesis_voice_name = "zh-CN-XiaoxiaoNeural"
+synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
+result = synthesizer.speak_text_async("你好，世界！").get()</pre>
+            </div>
+          </details>
+          <div class="option-row">
+            <div class="option-group"><label>Mode</label>
+              <select id="tts-mode"><option value="text">Plain Text</option><option value="ssml">SSML</option></select>
+            </div>
+            <div class="option-group" id="tts-voice-label"><label>Voice</label>
+              <select id="tts-voice">
+                {% for label, val in tts_voices.items() %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <textarea id="tts-input" rows="8" placeholder="输入要合成的文本..."></textarea>
+          <div class="button-row">
+            <button id="tts-synthesize-btn" class="btn primary shimmer">Synthesize</button>
+            <button id="tts-download-btn" class="btn secondary hidden">Download</button>
+          </div>
+          <div id="tts-status" class="status-bar"></div>
+          <audio id="tts-audio-player" class="hidden" controls></audio>
+        </div>
+      </div>

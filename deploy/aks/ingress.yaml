@@ -1,0 +1,72 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: speech-studio
+  annotations:
+    # --- NGINX Ingress Controller notes ---
+    # WebSocket requires long-lived connections. The default 60s read timeout
+    # will close Voice Live sessions mid-conversation.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+
+    # Sticky sessions via cookie. Required so repeated Voice Live / Whisper
+    # Batch requests from one browser land on the same pod that holds their
+    # server-side state (speech/voice_live.py, sessions.py).
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "speech-studio-affinity"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "10800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "10800"
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+
+    # Security
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+    # Optional: cert-manager for automatic TLS certificates
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - speech-studio.example.com
+      secretName: speech-studio-tls
+  rules:
+    - host: speech-studio.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: speech-studio
+                port:
+                  number: 80
+---
+# === AGIC (Azure Application Gateway Ingress Controller) alternative ===
+# Uncomment and replace above if using AGIC instead of NGINX.
+#
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: speech-studio
+#   annotations:
+#     kubernetes.io/ingress.class: azure/application-gateway
+#     appgw.ingress.kubernetes.io/request-timeout: "3600"
+#     appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+#     appgw.ingress.kubernetes.io/connection-draining: "true"
+#     appgw.ingress.kubernetes.io/connection-draining-timeout: "60"
+#     appgw.ingress.kubernetes.io/ssl-redirect: "true"
+# spec:
+#   rules:
+#     - host: speech-studio.example.com
+#       http:
+#         paths:
+#           - path: /*
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: speech-studio
+#                 port:
+#                   number: 80

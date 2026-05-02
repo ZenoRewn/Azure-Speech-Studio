@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: speech-studio
+  labels:
+    app: speech-studio
+spec:
+  type: ClusterIP
+  # Sticky session (per-SourceIP) at the Service level.
+  # The Ingress adds cookie-based affinity on top for finer control when
+  # clients share a NAT IP (common for mobile/office networks).
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800  # 3 hours
+  selector:
+    app: speech-studio
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5001
+      protocol: TCP

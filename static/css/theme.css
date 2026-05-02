@@ -1,0 +1,60 @@
+/* Light theme overrides (dark is default; toggle sets data-theme="light"). */
+
+[data-theme="light"] {
+  --bg-base: #f4f6ff;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-subtle: rgba(13, 24, 66, 0.04);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.88);
+
+  --text-primary: #0b1128;
+  --text-secondary: rgba(11, 17, 40, 0.72);
+  --text-muted: rgba(11, 17, 40, 0.5);
+  --text-inverse: #ffffff;
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --accent-ring: rgba(37, 99, 235, 0.25);
+
+  --violet: #7c3aed;
+  --violet-soft: rgba(124, 58, 237, 0.12);
+
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0891b2;
+
+  --success-soft: rgba(5, 150, 105, 0.12);
+  --warning-soft: rgba(217, 119, 6, 0.12);
+  --danger-soft: rgba(220, 38, 38, 0.12);
+  --info-soft: rgba(8, 145, 178, 0.12);
+
+  --border-subtle: rgba(13, 24, 66, 0.09);
+  --border-strong: rgba(13, 24, 66, 0.18);
+  --border-focus: var(--accent);
+
+  --shadow-glow: 0 40px 80px -20px rgba(37, 99, 235, 0.2);
+  --shadow-card: 0 18px 36px -20px rgba(13, 24, 66, 0.18),
+                 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  --shadow-elevated: 0 30px 60px -30px rgba(13, 24, 66, 0.28);
+
+  --overlay-scrim: rgba(244, 246, 255, 0.72);
+}
+
+[data-theme="light"] body::before {
+  background: radial-gradient(circle at 30% 30%,
+    rgba(37, 99, 235, 0.28), transparent 60%);
+  opacity: 0.7;
+}
+[data-theme="light"] body::after {
+  background: radial-gradient(circle at 70% 70%,
+    rgba(124, 58, 237, 0.22), transparent 55%);
+  opacity: 0.6;
+}
+
+[data-theme="light"] main::before {
+  background-image: radial-gradient(
+    rgba(13, 24, 66, 0.05) 1px, transparent 1px);
+}

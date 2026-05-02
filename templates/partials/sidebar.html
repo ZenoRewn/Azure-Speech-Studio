@@ -1,0 +1,50 @@
+    <!-- ================= Sidebar ================= -->
+    <aside id="sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-brand">
+          <div class="logo">A</div>
+          <div>
+            <h2>Azure Speech</h2>
+            <small class="muted">Studio · Aurora</small>
+          </div>
+        </div>
+
+        <section>
+          <h3>Azure Speech</h3>
+          <label>Speech Key
+            <input type="password" id="cfg-speech-key" value="{{ env_defaults.speech_key }}" placeholder="Enter Speech Key">
+          </label>
+          <label>Speech Region
+            <input type="text" id="cfg-speech-region" value="{{ env_defaults.speech_region }}" placeholder="e.g. eastus" list="regions-list">
+            <datalist id="regions-list">
+              {% for r in azure_speech_regions %}<option value="{{ r }}">{% endfor %}
+            </datalist>
+          </label>
+        </section>
+
+        <section>
+          <h3>Azure OpenAI</h3>
+          <label>API Key
+            <input type="password" id="cfg-aoai-key" value="{{ env_defaults.aoai_key }}" placeholder="Enter OpenAI Key">
+          </label>
+          <label>Endpoint
+            <input type="text" id="cfg-aoai-endpoint" value="{{ env_defaults.aoai_endpoint }}" placeholder="https://...openai.azure.com/">
+          </label>
+          <label>Deployment
+            <input type="text" id="cfg-aoai-deployment" value="{{ env_defaults.aoai_deployment }}">
+          </label>
+          <label>API Version
+            <input type="text" id="cfg-aoai-version" value="{{ env_defaults.aoai_version }}">
+          </label>
+        </section>
+
+        <section>
+          <h3>Voice Live</h3>
+          <label>Endpoint
+            <input type="text" id="cfg-vl-endpoint" value="{{ env_defaults.vl_endpoint }}" placeholder="wss://region.cognitiveservices.azure.com">
+          </label>
+        </section>
+      </div>
+
+      <button id="sidebar-toggle" title="Toggle sidebar">«</button>
+    </aside>

@@ -1,0 +1,180 @@
+/* Aurora — background, glass cards, cursor follow glow. */
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20vh -10vw auto auto;
+  width: 80vw;
+  height: 80vh;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(120px);
+  opacity: 0.55;
+}
+body::before {
+  top: -30vh;
+  left: -20vw;
+  right: auto;
+  background: radial-gradient(circle at 30% 30%,
+    rgba(96, 165, 250, 0.55),
+    transparent 65%);
+  animation: aurora-drift 28s var(--ease-in-out) infinite alternate;
+}
+body::after {
+  bottom: -25vh;
+  right: -15vw;
+  top: auto;
+  left: auto;
+  background: radial-gradient(circle at 70% 70%,
+    rgba(192, 132, 252, 0.45),
+    transparent 60%);
+  animation: aurora-drift 36s var(--ease-in-out) -8s infinite alternate-reverse;
+}
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(6vw, 4vh, 0) scale(1.08); }
+}
+
+/* Fine-grain noise overlay for atmosphere (pure CSS) */
+main::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 40%, transparent 75%);
+  opacity: 0.4;
+}
+
+/* Glass card — the signature surface */
+.glass {
+  position: relative;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out),
+    border-color var(--motion-base) var(--ease-out);
+  overflow: hidden;
+}
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(96, 165, 250, 0.14), transparent 40%);
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+.glass:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-elevated);
+}
+.glass:hover::before { opacity: 1; }
+
+.glass-interactive {
+  cursor: pointer;
+}
+
+/* App shell layout */
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+main.workspace {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.workspace-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.workspace-title h1 {
+  font-size: var(--text-3xl);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+.workspace-title .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+/* Hero badge */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+}
+.pill .dot {
+  width: 6px; height: 6px; border-radius: var(--radius-full);
+  background: var(--brand-teal);
+  box-shadow: 0 0 12px var(--brand-teal);
+}
+
+/* Staggered first-paint reveal */
+.enter,
+.enter-children > * {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: enter-in var(--motion-slow) var(--ease-out) forwards;
+}
+.enter-children > *:nth-child(1)  { animation-delay: 40ms; }
+.enter-children > *:nth-child(2)  { animation-delay: 100ms; }
+.enter-children > *:nth-child(3)  { animation-delay: 160ms; }
+.enter-children > *:nth-child(4)  { animation-delay: 220ms; }
+.enter-children > *:nth-child(5)  { animation-delay: 280ms; }
+.enter-children > *:nth-child(6)  { animation-delay: 340ms; }
+.enter-children > *:nth-child(7)  { animation-delay: 400ms; }
+.enter-children > *:nth-child(8)  { animation-delay: 460ms; }
+.enter-children > *:nth-child(n+9){ animation-delay: 520ms; }
+
+@keyframes enter-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter, .enter-children > * { animation: none; opacity: 1; transform: none; }
+  body::before, body::after { animation: none; }
+}

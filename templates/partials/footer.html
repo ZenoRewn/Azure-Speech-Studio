@@ -1,0 +1,31 @@
+  <!-- Data payloads for legacy JS -->
+  <script type="application/json" id="vl-model-tiers-data">{{ vl_model_tiers | tojson }}</script>
+  <script type="application/json" id="vl-voice-providers-data">{{ vl_voice_providers | tojson }}</script>
+
+  <!-- Socket.IO client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+
+  <!-- Core JS -->
+  <script src="/static/js/socket_manager.js"></script>
+  <script src="/static/js/audio.js"></script>
+  <script src="/static/js/effects.js"></script>
+  <script src="/static/js/app.js"></script>
+
+  <!-- Existing tabs -->
+  <script src="/static/js/tabs/realtime_stt.js"></script>
+  <script src="/static/js/tabs/fast_transcription.js"></script>
+  <script src="/static/js/tabs/speech_translate.js"></script>
+  <script src="/static/js/tabs/live_interpreter.js"></script>
+  <script src="/static/js/tabs/voice_live.js"></script>
+  <script src="/static/js/tabs/llm_speech.js"></script>
+  <script src="/static/js/tabs/tts.js"></script>
+
+  <!-- New tabs -->
+  <script src="/static/js/tabs/mai_transcribe.js"></script>
+  <script src="/static/js/tabs/whisper_batch.js"></script>
+  <script src="/static/js/tabs/multi_talker_tts.js"></script>
+  <script src="/static/js/tabs/video_translation.js"></script>
+  <script src="/static/js/tabs/voice_live_translator.js"></script>
+  <script src="/static/js/tabs/voice_creation.js"></script>
+  <script src="/static/js/tabs/voice_changer.js"></script>
+  <script src="/static/js/tabs/podcast_agent.js"></script>

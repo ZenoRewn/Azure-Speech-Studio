@@ -1,0 +1,53 @@
+      <!-- ================= 10. Video Translation ================= -->
+      <div id="tab-video-translation" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Video Translation</h3>
+              <span class="subtitle">Dub videos across 30 source locales — audio + subtitle in one pass.</span>
+            </div>
+          </div>
+          <p class="muted">Provide a publicly-accessible video URL (SAS OK). Long-running — typical job 5–15 minutes.</p>
+          <div class="option-row">
+            <div class="option-group"><label>Video URL</label>
+              <input type="url" id="vt-video-url" placeholder="https://..../video.mp4">
+            </div>
+            <div class="option-group"><label>Source Locale</label>
+              <select id="vt-source-locale">
+                {% for loc in video_translation_locales %}<option value="{{ loc }}" {% if loc == 'en-US' %}selected{% endif %}>{{ loc }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="option-group"><label>Target Locale</label>
+              <select id="vt-target-locale">
+                {% for loc in video_translation_locales %}<option value="{{ loc }}" {% if loc == 'zh-CN' %}selected{% endif %}>{{ loc }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="option-group"><label>Voice Kind</label>
+              <select id="vt-voice-kind"><option value="PlatformVoice">Platform Voice</option><option value="PersonalVoice">Personal Voice</option></select>
+            </div>
+          </div>
+          <div class="option-row">
+            <div class="option-group"><label>Speaker Count (optional)</label>
+              <input type="number" id="vt-speaker-count" min="1" max="10">
+            </div>
+            <div class="option-group"><label>Subtitle Chars/Segment</label>
+              <input type="number" id="vt-subtitle-max" min="10" max="200" value="42">
+            </div>
+            <div class="option-group"><label>Burn Subtitles</label>
+              <label class="checkbox-row"><input type="checkbox" id="vt-burn-subtitles"> Embed in video</label>
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="vt-start-btn" class="btn primary shimmer">Start Translation</button>
+            <button id="vt-stop-btn" class="btn danger hidden">Cancel</button>
+          </div>
+          <div id="vt-status" class="status-bar"></div>
+          <div id="vt-result-section" class="col hidden">
+            <h4>Result</h4>
+            <div class="row">
+              <a id="vt-video-link" class="btn secondary" href="#" target="_blank">Download Translated Video</a>
+              <a id="vt-subtitle-link" class="btn ghost" href="#" target="_blank">Download Subtitles</a>
+            </div>
+          </div>
+        </div>
+      </div>

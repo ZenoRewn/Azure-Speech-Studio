@@ -1,0 +1,29 @@
+      <!-- ================= 8. Whisper Batch ================= -->
+      <div id="tab-whisper-batch" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Whisper Batch</h3>
+              <span class="subtitle">Batch transcription via Azure Speech v3.2 with the Whisper base model.</span>
+            </div>
+          </div>
+          <p class="muted">Provide a publicly-accessible audio URL (SAS URLs work). The job typically takes 2–5 minutes.</p>
+          <div class="option-row">
+            <div class="option-group"><label>Audio URL</label>
+              <input type="url" id="wb-audio-url" placeholder="https://..../audio.wav">
+            </div>
+            <div class="option-group"><label>Locale</label>
+              <select id="wb-locale">
+                {% for code, name in language_options.items() %}<option value="{{ code }}">{{ code }} — {{ name }}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <button id="wb-start-btn" class="btn primary shimmer">Start Batch Job</button>
+            <button id="wb-stop-btn" class="btn danger hidden">Cancel</button>
+            <div id="wb-ring" class="ring-progress hidden"></div>
+          </div>
+          <div id="wb-status" class="status-bar"></div>
+          <pre id="wb-results" class="result-box"></pre>
+        </div>
+      </div>

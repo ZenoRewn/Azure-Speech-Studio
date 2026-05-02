@@ -1,0 +1,30 @@
+      <!-- ================= 12. Voice Changer ================= -->
+      <div id="tab-voice-changer" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Voice Changer</h3>
+              <span class="subtitle">Convert any speaker's voice into one of 7 target voices.</span>
+            </div>
+          </div>
+          <div id="vch-region-warn" class="status-bar warning hidden"></div>
+          <p class="muted">Supported regions: <span class="mono">{{ voice_changer_regions | join(', ') }}</span>. Requires Azure Blob Storage credentials in environment.</p>
+          <input type="file" id="vch-file-input" accept="audio/*">
+          <div class="option-group"><label>Target Voice</label>
+            <div class="voice-grid" id="vch-voice-grid">
+              {% for label, val in voice_changer_targets.items() %}
+              <div class="voice-card" data-voice="{{ val }}">
+                <div class="voice-name">{{ label }}</div>
+                <div class="voice-id">{{ val }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="vch-start-btn" class="btn primary shimmer">Convert</button>
+            <button id="vch-download-btn" class="btn secondary hidden">Download</button>
+          </div>
+          <div id="vch-status" class="status-bar"></div>
+          <audio id="vch-audio-player" class="hidden" controls></audio>
+        </div>
+      </div>

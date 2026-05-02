@@ -1,0 +1,59 @@
+      <!-- ================= 5. Voice Live ================= -->
+      <div id="tab-voice-live" class="tab-panel">
+        <div class="glass card enter-children">
+          <div class="card-header">
+            <div class="card-title">
+              <h3>Voice Live</h3>
+              <span class="subtitle">Real-time voice conversation with AI — multi-model, multi-voice.</span>
+            </div>
+          </div>
+          <details class="code-reference"><summary>Code Reference & Documentation</summary>
+            <div class="doc-body">
+<pre>from azure.ai.voicelive.aio import connect
+async with connect(endpoint="ENDPOINT", credential=cred, model="gpt-4o-mini") as c: ...</pre>
+            </div>
+          </details>
+          <div class="option-row">
+            <div class="option-group"><label>Model Tier</label>
+              <select id="vl-model-tier">{% for tier in vl_model_tiers.keys() %}<option value="{{ tier }}">{{ tier }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>Model</label><select id="vl-model"></select></div>
+            <div class="option-group"><label>Voice Provider</label>
+              <select id="vl-voice-provider">{% for p in vl_voice_providers.keys() %}<option value="{{ p }}">{{ p }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>Voice</label><select id="vl-voice"></select></div>
+          </div>
+          <div class="option-row">
+            <div class="option-group"><label>Target Language</label>
+              <select id="vl-target-language">{% for label, val in vl_target_languages.items() %}<option value="{{ val }}">{{ label }}</option>{% endfor %}</select>
+            </div>
+            <div class="option-group"><label>ASR Model</label>
+              <select id="vl-asr-model">{% for m in vl_asr_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
+            </div>
+          </div>
+          <div class="option-group"><label>System Instructions</label>
+            <textarea id="vl-instructions" rows="3">You are a helpful AI assistant. Respond naturally and conversationally. Keep your responses concise but engaging.</textarea>
+          </div>
+          <div class="button-row">
+            <button id="vl-start-btn" class="btn primary shimmer">Start Voice Live</button>
+            <button id="vl-stop-btn" class="btn danger hidden">Stop Voice Live</button>
+          </div>
+          <div id="vl-status" class="status-bar"></div>
+          <div id="vl-conversation" class="conversation"></div>
+          <details class="code-reference"><summary>Usage Statistics</summary>
+            <div class="doc-body stats-grid">
+              <div class="stat"><span class="stat-label">Total</span><span class="stat-value ticker" id="vl-stat-total">0</span></div>
+              <div class="stat"><span class="stat-label">Input</span><span class="stat-value ticker" id="vl-stat-input">0</span></div>
+              <div class="stat"><span class="stat-label">Input · Text</span><span class="stat-value ticker" id="vl-stat-input-text">0</span></div>
+              <div class="stat"><span class="stat-label">Input · Audio</span><span class="stat-value ticker" id="vl-stat-input-audio">0</span></div>
+              <div class="stat"><span class="stat-label">Input · Cached</span><span class="stat-value ticker" id="vl-stat-input-cached">0</span></div>
+              <div class="stat"><span class="stat-label">Output</span><span class="stat-value ticker" id="vl-stat-output">0</span></div>
+              <div class="stat"><span class="stat-label">Output · Text</span><span class="stat-value ticker" id="vl-stat-output-text">0</span></div>
+              <div class="stat"><span class="stat-label">Output · Audio</span><span class="stat-value ticker" id="vl-stat-output-audio">0</span></div>
+              <div class="stat"><span class="stat-label">Cumulative Total</span><span class="stat-value ticker" id="vl-stat-cum-total">0</span></div>
+              <div class="stat"><span class="stat-label">Cumulative Input</span><span class="stat-value ticker" id="vl-stat-cum-input">0</span></div>
+              <div class="stat"><span class="stat-label">Cumulative Output</span><span class="stat-value ticker" id="vl-stat-cum-output">0</span></div>
+            </div>
+          </details>
+        </div>
+      </div>
