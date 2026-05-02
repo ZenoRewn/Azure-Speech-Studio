@@ -256,7 +256,18 @@ def mai_transcribe_route():
     )
     if resp.status_code == 200:
         return jsonify(mai_transcribe.normalize_response(resp.json()))
-    return jsonify({"error": resp.text}), resp.status_code
+    # Surface Azure's "model not supported in region" as a clearer hint
+    body = resp.text or ""
+    if resp.status_code == 400 and "Enhanced mode with model" in body:
+        return jsonify({
+            "error": (
+                f"MAI-Transcribe-1 is not available in region "
+                f"'{speech_region}'. Provision a Speech resource in a supported "
+                "region (e.g. eastus / eastus2 / westeurope) and retry."
+            ),
+            "upstream": body,
+        }), 400
+    return jsonify({"error": body}), resp.status_code
 
 
 # --- Multi-Talker TTS ---

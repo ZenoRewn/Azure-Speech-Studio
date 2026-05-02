@@ -36,8 +36,10 @@
 
   $('vlt-start-btn').addEventListener('click', async () => {
     const cfg = App.getConfig();
-    if (!cfg.vl_endpoint && !cfg.speech_region) {
-      App.setStatus('vlt-status', 'error', 'Provide Voice Live endpoint or Speech region in sidebar.');
+    if (!cfg.vl_endpoint) {
+      App.setStatus('vlt-status', 'error',
+        'Voice Live Endpoint is required. Set it in the sidebar ' +
+        '("Voice Live" section) — e.g. https://<your-aoai-resource>.cognitiveservices.azure.com');
       return;
     }
     const apiKey = cfg.api_key || cfg.speech_key;
@@ -55,7 +57,7 @@
 
       socket.emit('vlt:start', {
         config: {
-          vl_endpoint: cfg.vl_endpoint || `https://${cfg.speech_region}.cognitiveservices.azure.com`,
+          vl_endpoint: cfg.vl_endpoint,
           api_key: apiKey,
           model: $('vlt-model').value,
           voice: $('vlt-voice').value,
