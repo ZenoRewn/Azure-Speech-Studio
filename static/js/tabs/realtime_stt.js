@@ -10,8 +10,8 @@
   // Show/hide file input based on source
   document.querySelectorAll('input[name="rt-source"]').forEach(radio => {
     radio.addEventListener('change', () => {
-      document.getElementById('rt-file-section').style.display =
-        radio.value === 'file' && radio.checked ? '' : 'none';
+      document.getElementById('rt-file-section').classList.toggle(
+        'hidden', !(radio.value === 'file' && radio.checked));
     });
   });
 
@@ -59,8 +59,8 @@
         await mic.start();
         socket.emit('rt:start_mic', { config: buildConfig() });
         isRecording = true;
-        document.getElementById('rt-start-btn').style.display = 'none';
-        document.getElementById('rt-stop-btn').style.display = '';
+        document.getElementById('rt-start-btn').classList.add('hidden');
+        document.getElementById('rt-stop-btn').classList.remove('hidden');
       } catch (err) {
         App.setStatus('rt-status', 'error', 'Microphone error: ' + err.message);
       }
@@ -90,8 +90,8 @@
     }
     SocketManager.getSocket().emit('rt:stop_mic');
     isRecording = false;
-    document.getElementById('rt-start-btn').style.display = '';
-    document.getElementById('rt-stop-btn').style.display = 'none';
+    document.getElementById('rt-start-btn').classList.remove('hidden');
+    document.getElementById('rt-stop-btn').classList.add('hidden');
   });
 
   // SocketIO events — register directly (scripts load at end of body)

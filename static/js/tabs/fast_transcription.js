@@ -8,12 +8,13 @@
   const maxSpeakersLabel = document.getElementById('ft-max-speakers-label');
 
   langDetectSelect.addEventListener('change', () => {
-    langSelectRow.style.display = langDetectSelect.value === 'Off' ? 'none' : '';
+    langSelectRow.classList.toggle('hidden', langDetectSelect.value === 'Off');
   });
 
   diarizationCheckbox.addEventListener('change', () => {
     maxSpeakersLabel.style.display = diarizationCheckbox.checked ? '' : 'none';
   });
+  // keep initial state consistent with checkbox (inline style="display:none")
 
   function getSelectedLanguages() {
     const sel = document.getElementById('ft-languages');
@@ -49,7 +50,7 @@
     }
 
     document.getElementById('ft-results').textContent = '';
-    document.getElementById('ft-combined-section').style.display = 'none';
+    document.getElementById('ft-combined-section').classList.add('hidden');
     document.getElementById('ft-combined').value = '';
 
     try {
@@ -73,7 +74,7 @@
   socket.on('ft:combined', (data) => {
     if (data.text) {
       document.getElementById('ft-combined').value = data.text;
-      document.getElementById('ft-combined-section').style.display = '';
+      document.getElementById('ft-combined-section').classList.remove('hidden');
     }
   });
 

@@ -7,8 +7,8 @@
 
   document.querySelectorAll('input[name="st-source"]').forEach(radio => {
     radio.addEventListener('change', () => {
-      document.getElementById('st-file-section').style.display =
-        radio.value === 'file' && radio.checked ? '' : 'none';
+      document.getElementById('st-file-section').classList.toggle(
+        'hidden', !(radio.value === 'file' && radio.checked));
     });
   });
 
@@ -60,8 +60,8 @@
         await mic.start();
         socket.emit('st:start_mic', { config: buildConfig() });
         isActive = true;
-        document.getElementById('st-start-btn').style.display = 'none';
-        document.getElementById('st-stop-btn').style.display = '';
+        document.getElementById('st-start-btn').classList.add('hidden');
+        document.getElementById('st-stop-btn').classList.remove('hidden');
       } catch (err) {
         App.setStatus('st-status', 'error', 'Microphone error: ' + err.message);
       }
@@ -89,8 +89,8 @@
     }
     SocketManager.getSocket().emit('st:stop_mic');
     isActive = false;
-    document.getElementById('st-start-btn').style.display = '';
-    document.getElementById('st-stop-btn').style.display = 'none';
+    document.getElementById('st-start-btn').classList.remove('hidden');
+    document.getElementById('st-stop-btn').classList.add('hidden');
   });
 
   const socket = SocketManager.getSocket();

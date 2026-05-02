@@ -142,8 +142,8 @@
       socket.emit('vl:start', { config });
 
       isActive = true;
-      document.getElementById('vl-start-btn').style.display = 'none';
-      document.getElementById('vl-stop-btn').style.display = '';
+      document.getElementById('vl-start-btn').classList.add('hidden');
+      document.getElementById('vl-stop-btn').classList.remove('hidden');
     } catch (err) {
       App.setStatus('vl-status', 'error', 'Microphone error: ' + err.message);
     }
@@ -161,8 +161,8 @@
     }
     SocketManager.getSocket().emit('vl:stop');
     isActive = false;
-    document.getElementById('vl-start-btn').style.display = '';
-    document.getElementById('vl-stop-btn').style.display = 'none';
+    document.getElementById('vl-start-btn').classList.remove('hidden');
+    document.getElementById('vl-stop-btn').classList.add('hidden');
   });
 
   // SocketIO events
@@ -203,8 +203,8 @@
       playback.close();
       playback = null;
     }
-    document.getElementById('vl-start-btn').style.display = '';
-    document.getElementById('vl-stop-btn').style.display = 'none';
+    document.getElementById('vl-start-btn').classList.remove('hidden');
+    document.getElementById('vl-stop-btn').classList.add('hidden');
   });
 })();
 

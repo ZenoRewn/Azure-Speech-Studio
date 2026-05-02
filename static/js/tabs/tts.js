@@ -78,10 +78,10 @@
       currentBlobUrl = URL.createObjectURL(blob);
 
       audioPlayer.src = currentBlobUrl;
-      audioPlayer.style.display = '';
+      audioPlayer.classList.remove('hidden');
       audioPlayer.play();
 
-      downloadBtn.style.display = '';
+      downloadBtn.classList.remove('hidden');
       App.setStatus('tts-status', 'success', 'Synthesis complete.');
     } catch (err) {
       App.setStatus('tts-status', 'error', err.message);

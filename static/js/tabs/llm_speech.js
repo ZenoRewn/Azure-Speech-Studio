@@ -52,7 +52,7 @@
       }
 
       document.getElementById('llm-transcript').value = fullText;
-      document.getElementById('llm-transcript-section').style.display = '';
+      document.getElementById('llm-transcript-section').classList.remove('hidden');
 
       // Phrase details
       const phrases = data.phrases || [];
@@ -68,7 +68,7 @@
           div.innerHTML = `<strong>[${offset.toFixed(1)}s - ${(offset + dur).toFixed(1)}s]</strong> (${locale}) ${p.text || ''}`;
           phrasesEl.appendChild(div);
         });
-        document.getElementById('llm-phrases-section').style.display = '';
+        document.getElementById('llm-phrases-section').classList.remove('hidden');
       }
 
       App.setStatus('llm-status', 'success', 'Transcription complete.');
@@ -111,7 +111,7 @@
       document.getElementById('llm-translation').value = fullText;
       document.getElementById('llm-translation-header').textContent =
         `Translation Result (${targetLang})`;
-      document.getElementById('llm-translation-section').style.display = '';
+      document.getElementById('llm-translation-section').classList.remove('hidden');
       currentTranslationLang = targetLang;
 
       App.setStatus('llm-status', 'success', 'Translation complete.');
@@ -153,7 +153,7 @@
       const url = URL.createObjectURL(blob);
       const player = document.getElementById('llm-audio-player');
       player.src = url;
-      player.style.display = '';
+      player.classList.remove('hidden');
       player.play();
       App.setStatus('llm-status', 'success', 'Playing audio...');
     } catch (err) {

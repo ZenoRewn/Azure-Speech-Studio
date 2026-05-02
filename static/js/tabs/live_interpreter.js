@@ -9,8 +9,8 @@
 
   document.querySelectorAll('input[name="li-source"]').forEach(radio => {
     radio.addEventListener('change', () => {
-      document.getElementById('li-file-section').style.display =
-        radio.value === 'file' && radio.checked ? '' : 'none';
+      document.getElementById('li-file-section').classList.toggle(
+        'hidden', !(radio.value === 'file' && radio.checked));
     });
   });
 
@@ -29,11 +29,11 @@
   }
 
   function showButtons(state) {
-    document.getElementById('li-start-btn').style.display = state === 'idle' ? '' : 'none';
-    document.getElementById('li-pause-btn').style.display = state === 'active' ? '' : 'none';
-    document.getElementById('li-resume-btn').style.display = state === 'paused' ? '' : 'none';
-    document.getElementById('li-stop-btn').style.display = (state === 'active' || state === 'paused') ? '' : 'none';
-    document.getElementById('li-download-btn').style.display = state === 'stopped' ? '' : 'none';
+    document.getElementById('li-start-btn').classList.toggle('hidden', state !== 'idle');
+    document.getElementById('li-pause-btn').classList.toggle('hidden', state !== 'active');
+    document.getElementById('li-resume-btn').classList.toggle('hidden', state !== 'paused');
+    document.getElementById('li-stop-btn').classList.toggle('hidden', !(state === 'active' || state === 'paused'));
+    document.getElementById('li-download-btn').classList.toggle('hidden', state !== 'stopped');
   }
 
   function appendResult(data) {
@@ -73,7 +73,7 @@
     const source = getSelectedSource();
     document.getElementById('li-results').innerHTML = '';
     document.getElementById('li-interim').textContent = '';
-    document.getElementById('li-audio-container').style.display = 'none';
+    document.getElementById('li-audio-container').classList.add('hidden');
 
     playback = new AudioPlayback(16000);
 
@@ -176,7 +176,7 @@
     const container = document.getElementById('li-audio-container');
     const player = document.getElementById('li-audio-player');
     player.src = url;
-    container.style.display = '';
+    container.classList.remove('hidden');
 
     const a = document.createElement('a');
     a.href = url;
